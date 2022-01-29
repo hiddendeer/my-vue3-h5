@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const service = axios.create({
-    baseURL: 'https://csctest.gtcloud.cn', // url = base url + request url
+    baseURL: 'http://49.235.66.253:7000', // url = base url + request url
     withCredentials: true, // send cookies when cross-domain requests
     timeout: 5000 // request timeout
   })
@@ -9,6 +9,9 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
       // do something before request is sent
+      if (localStorage.getItem('token')) {
+        config.headers.token = localStorage.getItem('token')
+      }
       return config
     },
     error => {
@@ -30,7 +33,9 @@ service.interceptors.request.use(
      * You can also judge the status by HTTP Status Code
      */
     response => {
+
       const res = response.data
+
       // if the custom code is not 20000, it is judged as an error.
         return res
     },

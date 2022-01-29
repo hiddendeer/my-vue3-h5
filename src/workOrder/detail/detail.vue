@@ -6,7 +6,7 @@
       <!-- 头部信息 -->
       <div class="header">
         <div class="row-normal row1">
-          <view class="title font-medium">测试安卓消息</view>
+          <view class="title font-medium flex">测试安卓消息</view>
           <van-tag
             class="tag"
             color="#FFAA64"

@@ -1,42 +1,22 @@
 
 
 <script>
+import { useRouter } from "vue-router";
 export default {
-  created() {
-    console.log(22);
-  },
+
   props: {
     msg: String
   },
   setup(props) {
+    const $router = useRouter();
+    $router.push('/login')
   }
   
 }
 </script>
 
 <template>
-<p class="underline">sfsfsdfasfsfafsdfasfsfafasfsfafsdfasfsfa</p>
-  <h1>{{ msg }}</h1>
 
-  <p>
-    Recommended IDE setup:
-    <a href="https://code.visualstudio.com/" target="_blank">VSCode222</a>
-    +
-    <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar33</a>
-  </p>
-
-  <p>
-    <a href="https://vitejs.dev/guide/features.html" target="_blank">
-      Vite Documentation
-    </a>
-    |
-    <a href="https://v3.vuejs.org/" target="_blank">Vue 3 Documentation</a>
-  </p>
-
-  <p>
-    Edit
-    <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
 </template>
 
 <style scoped>
