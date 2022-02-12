@@ -164,6 +164,7 @@ export default {
         localStorage.setItem("taskId", getOrderInfo.taskId);
         localStorage.setItem("token", getOrderInfo.token);
         localStorage.setItem("orderCode", getOrderInfo.orderCode);
+        localStorage.setItem("scope", getOrderInfo.firstServer);
         localStorage.setItem("auth", 'tourist');
         localStorage.setItem("userName", '客户');
         $router.push("/index");

@@ -58,6 +58,32 @@
             lazy-rules
             :rules="[(val) => (val !== null && val !== '') || '请填写验证码']"
           />
+
+          <q-select
+            v-model="selectModel"
+            :options="selectOptions"
+            label="选择类目 (默认全选)"
+            multiple
+            emit-value
+            map-options
+            clearable
+          >
+            <template
+              v-slot:option="{ itemProps, opt, selected, toggleOption }"
+            >
+              <q-item v-bind="itemProps">
+                <q-item-section>
+                  <q-item-label v-html="opt.label" />
+                </q-item-section>
+                <q-item-section side>
+                  <q-toggle
+                    :model-value="selected"
+                    @update:model-value="toggleOption(opt)"
+                  />
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
         </q-card-section>
 
         <q-card-actions align="right">
@@ -79,13 +105,13 @@
     <q-card>
       <q-card-section class="flex justify-between">
         <div class="text-h6">选中的类别</div>
-         <q-btn flat round color="brown-5" icon="close" @click="closeDialog" />
+        <q-btn flat round color="brown-5" icon="close" @click="closeDialog" />
       </q-card-section>
       <q-separator />
 
       <q-card-section
         class="q-pt-none selectWidth"
-        style="min-width: 230px;postion: relative; top: 20px"
+        style="min-width: 230px; postion: relative; top: 20px"
       >
         <q-chip
           v-for="item in tagFilter"
@@ -106,7 +132,7 @@
 const initialPagination = {
   descending: false,
   page: 1,
-  rowsPerPage: 20,
+  rowsPerPage: 8,
 };
 const columns = [
   {
@@ -127,7 +153,7 @@ const columns = [
   { name: "updateDate", label: "完成日期", align: "left", field: "updateDate" },
 ];
 
-import { list, save, exportExcel } from "@/api/rest";
+import { list, save, exportExcel, getServersByParams } from "@/api/rest";
 import { ref, toRaw, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
@@ -146,21 +172,24 @@ export default {
     const position = ref("right");
     const selected = ref([]);
     const tagFilter = ref([]);
+    const selectModel = ref([]);
+    const selectOptions = ref([]);
 
     onMounted(() => {
       listData();
+      getNodeList();
     });
 
     const closeDialog = () => {
-      fullWidth.value = false
-    }
+      fullWidth.value = false;
+    };
 
     const addOrder = () => {
       alert.value = true;
     };
 
     const viewOrder = (param) => {
-      tagFilter.value = param
+      tagFilter.value = param;
       fullWidth.value = true;
     };
 
@@ -217,6 +246,11 @@ export default {
         orderCode: orderCode.value,
         authCode: authCode.value,
       };
+
+      if (selectModel.value && selectModel.value.length > 0) {
+        const list = selectModel.value.map((item) => item.severId);
+        jsonData.firstServer = list.join(",");
+      }
 
       save(jsonData).then((res) => {
         if (res.code == "200") {
@@ -276,7 +310,16 @@ export default {
       });
     };
 
+    const getNodeList = () => {
+      getServersByParams({ level: "1" }).then((res) => {
+        if (res.code == "200") {
+          selectOptions.value = res.servers;
+        }
+      });
+    };
+
     return {
+      selectOptions,
       position,
       closeDialog,
       viewOrder,
@@ -289,6 +332,7 @@ export default {
       authCode,
       alert,
       addOrder,
+      getNodeList,
       onSubmit,
       onReset() {
         orderCode.value = "";
@@ -305,6 +349,50 @@ export default {
       initialPagination,
       columns,
       rows,
+      selectModel,
+
+      options: [
+        {
+          label: "Google",
+          value: 1,
+        },
+        {
+          label: "Facebook",
+          value: 2,
+        },
+        {
+          label: "Twitter",
+          value: 3,
+        },
+        {
+          label: "Apple",
+          value: 4,
+        },
+        {
+          label: "Oracle",
+          value: 5,
+        },
+        {
+          label: "Google",
+          value: 1,
+        },
+        {
+          label: "Facebook",
+          value: 2,
+        },
+        {
+          label: "Twitter",
+          value: 3,
+        },
+        {
+          label: "Apple",
+          value: 4,
+        },
+        {
+          label: "Oracle",
+          value: 5,
+        },
+      ],
     };
   },
 };

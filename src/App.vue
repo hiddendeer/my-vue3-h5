@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1" v-if="isDraw">
-    <q-header class="bg-white text-grey-8 q-py-xs header-border" height-hint="58">
+    <q-header  v-if="isShow" class="bg-white text-grey-8 q-py-xs header-border" height-hint="58">
       <q-toolbar>
         <q-btn
         v-if="isShow"
@@ -15,7 +15,7 @@
         <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs">
             <q-icon  name="fact_check" style="color: #1C6DD0"  size="28px" />
           <q-toolbar-title shrink class="text-weight-bold">
-            订单系统
+            商标注册系统
           </q-toolbar-title>
         </q-btn>
 
@@ -89,7 +89,7 @@ export default {
     const $router = useRouter()
     const $route = useRoute()
     const leftDrawerOpen = ref(false);
-    const userName = ref(localStorage.userName)
+    const userName = localStorage.userName
     const auth = ref(localStorage.auth)
     const isShow = ref(false)
     const isDraw = ref(true)

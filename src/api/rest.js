@@ -31,6 +31,14 @@ export function getAllServersByName(data) {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     })
 }
+export function getServersByParams(data) {
+    return request({
+      url: '/servertypes/getServersByParams',
+      method: 'post',
+      data: qs.stringify(data),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+}
 export function getOrder(data) {
     return request({
       url: '/ordernumber/getOrder',
