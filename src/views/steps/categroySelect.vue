@@ -129,16 +129,18 @@
 </template>
 
 <script>
-import {
-  getServersByParams,
-  update,
-} from "@/api/rest";
-import { ref, nextTick, toRaw, onMounted } from "vue";
+import { getServersByParams, update } from "@/api/rest";
+import { ref, nextTick, toRaw, onMounted, toRefs } from "vue";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 
 export default {
-  setup() {
+  props: {
+    submitContent: Object,
+  },
+  setup(props) {
+    const { submitContent } = toRefs(props);
+
     const $q = useQuasar();
     const $router = useRouter();
     const qTree = ref();
@@ -193,43 +195,46 @@ export default {
       nextTick(() => {
         // 界面展示数据
         if (e.length == 0) {
-          showNode.value = []
+          showNode.value = [];
         }
-           // 取消勾选处理
-           if (qTicked.value.length > 0 && e.length < qNode.value.length) {
-             let node = -1
-             for (const key in qTicked.value) {
-               if (!e.includes(qTicked.value[key])) {
-                 node = key;
-                 break;
-               }
-             }
-             if (node > -1) {
-  
-               const nodeItem= qNode.value.find(item => item.serverName == qTicked.value[node])
-                const node1 = showNode.value.findIndex(item => item.groupId == nodeItem.groupId)
-                if (node1 > -1) {
-                  const node2 = showNode.value[node1].parent.findIndex(item => item.parentId == nodeItem.parentId)
-                  const node3 = showNode.value[node1].parent[node2].nodes.findIndex(item => item.severId == nodeItem.severId)
-                  if (node3 > -1) {
-                    showNode.value[node1].parent[node2].nodes.splice(node3, 1)
-                  }
-               }
+        // 取消勾选处理
+        if (qTicked.value.length > 0 && e.length < qNode.value.length) {
+          let node = -1;
+          for (const key in qTicked.value) {
+            if (!e.includes(qTicked.value[key])) {
+              node = key;
+              break;
+            }
+          }
+          if (node > -1) {
+            const nodeItem = qNode.value.find(
+              (item) => item.serverName == qTicked.value[node]
+            );
+            const node1 = showNode.value.findIndex(
+              (item) => item.groupId == nodeItem.groupId
+            );
+            if (node1 > -1) {
+              const node2 = showNode.value[node1].parent.findIndex(
+                (item) => item.parentId == nodeItem.parentId
+              );
+              const node3 = showNode.value[node1].parent[node2].nodes.findIndex(
+                (item) => item.severId == nodeItem.severId
+              );
+              if (node3 > -1) {
+                showNode.value[node1].parent[node2].nodes.splice(node3, 1);
+              }
+            }
+          }
+        }
 
-             }
-
-           }
-
-     
-        
         qTicked.value = e;
 
         // 提交的数据
         let nodeArr = qTree.value.getTickedNodes().map((item) => toRaw(item));
 
         if (nodeArr.indexOf(null) > -1) {
-          const lastNode = nodeArr.pop()
-          qNode.value.push(lastNode)
+          const lastNode = nodeArr.pop();
+          qNode.value.push(lastNode);
         } else {
           qNode.value = nodeArr.filter((item) => item);
         }
@@ -296,27 +301,33 @@ export default {
             }
           }
           showNode.value = shoNode;
-
         }
         // qNode.value = nodeArr.filter((item) => item);
       });
     };
 
     const serversByLevel = async () => {
-      const getInfo = await getServersByParams({scope: localStorage.scope, type: '1'});
+      const getInfo = await getServersByParams({
+        scope: localStorage.scope,
+        type: "1",
+      });
 
-      if (getInfo.code == '202') {
-          $q.notify({
-              position: "top",
-              type: "negative",
-              message: getInfo.msg,
-              timeout: 1500,
-            });
-            localStorage.clear();
-            $router.push("/login");
+      if (getInfo.code == "202") {
+        $q.notify({
+          position: "top",
+          type: "negative",
+          message: getInfo.msg,
+          timeout: 1500,
+        });
+        localStorage.clear();
+        $router.push("/login");
       }
       showTree.value = true;
-      if (getInfo.code == "200" && getInfo.servers && getInfo.servers.length > 0) {
+      if (
+        getInfo.code == "200" &&
+        getInfo.servers &&
+        getInfo.servers.length > 0
+      ) {
         getInfo.servers.forEach((item) => {
           item.noTick = true;
           if (item.children && item.children.length > 0) {
@@ -335,7 +346,7 @@ export default {
       const searchNodes = await getServersByParams({
         serverName: searchNode.value,
         scope: localStorage.scope,
-        type: '3'
+        type: "3",
       });
       showTree.value = true;
       if (searchNodes.code == "200" && searchNodes.servers.length > 0) {
@@ -370,6 +381,29 @@ export default {
     };
     // 提交
     const submit = () => {
+      console.log(submitContent.value);
+      if (!submitContent.value.type || submitContent.value.type === '') {
+            $q.dialog({
+          title: "无法提交",
+          message: "请检查提交内容",
+        });
+        return;
+      }
+      if (!submitContent.value.fileIds || submitContent.value.fileIds === '') {
+            $q.dialog({
+          title: "无法提交",
+          message: "请检查提交内容",
+        });
+        return;
+      }
+      if (!submitContent.value.trademarkName || submitContent.value.trademarkName === '') {
+            $q.dialog({
+          title: "无法提交",
+          message: "请检查提交内容",
+        });
+        return;
+      }
+  
       if (!qNode.value || qNode.value.length == "0") {
         $q.dialog({
           title: "无法提交",
@@ -387,7 +421,14 @@ export default {
         const submitInfo = toRaw(qNode.value);
         const serverMap = submitInfo.map((item) => item.severId);
         const serverIds = serverMap.join(",");
-        update({ taskId: taskId.value, serverIds }).then((res) => {
+        const submitObj = {
+          taskId: taskId.value, 
+          serverIds,
+          type: submitContent.value.type,
+          trademarkName: submitContent.value.trademarkName,
+          fileIds: submitContent.value.fileIds,
+        }
+        update(submitObj).then((res) => {
           if (res.code && res.code == "200") {
             $q.notify({
               position: "top",
@@ -419,6 +460,7 @@ export default {
     };
 
     return {
+      props,
       removeNode,
       showNode,
       node1Filter,
@@ -467,11 +509,11 @@ export default {
 
         const selectNodes = await getServersByParams({
           serverId: currentNode.severId,
-          type: '2',
-          scope: localStorage.scope
+          type: "2",
+          scope: localStorage.scope,
         });
 
-        console.log(selectNodes,22);
+        console.log(selectNodes, 22);
 
         if (
           selectNodes.code != "200" ||
@@ -497,7 +539,6 @@ export default {
       },
     };
   },
-
 };
 </script>
 

@@ -136,6 +136,7 @@ import { ref, reactive, nextTick, toRaw, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import { getOrder } from "@/api/rest";
+import { useStore } from "vuex"
 export default {
   components: {},
   setup() {
@@ -143,6 +144,10 @@ export default {
     const orderCode = ref("");
     const authCode = ref("");
     const $router = useRouter();
+
+    const store = useStore()
+    store.dispatch('clearOut')
+    console.log(store,2323);
 
     const login = async () => {
       if (orderCode.value == "" || authCode.value == "") {
