@@ -9,25 +9,18 @@
       row-key="orderCode"
       :pagination="initialPagination"
       color="primary"
+      @row-click="clickRow"
     >
       <template v-slot:top-right>
         <q-btn flat color="green" label="导出Excel" @click="clickExcel" />
+         <q-btn flat color="green" label="导出Zip" @click="clickZip" />
         <q-btn flat color="primary" label="新增" @click="addOrder" />
       </template>
 
       <template v-slot:body-cell-orderStateName="props">
         <q-td :props="props">
-          <div v-if="props.row.orderState == '2'">
+          <div v-if="props.row.orderState == '3'">
             <q-badge color="green" :label="props.row.orderStateName" />
-            <q-btn
-              flat
-              rounded
-              size="xs"
-              color="primary"
-              label="查看"
-              @click="viewOrder(props.row.serverIds)"
-              style="margin-left: 3px"
-            />
           </div>
           <div v-else>
             <q-badge color="primary" :label="props.row.orderStateName" />
@@ -102,7 +95,7 @@
   </q-dialog>
 
   <q-dialog v-model="fullWidth" full-height maximized :position="position">
-    <q-card>
+    <q-card style="position: relative; width: 500px">
       <q-card-section class="flex justify-between">
         <div class="text-h6">选中的类别</div>
         <q-btn flat round color="brown-5" icon="close" @click="closeDialog" />
@@ -111,18 +104,65 @@
 
       <q-card-section
         class="q-pt-none selectWidth"
-        style="min-width: 230px; postion: relative; top: 20px"
+        style="postion: relative; top: 20px"
       >
-        <q-chip
-          v-for="item in tagFilter"
-          :key="item"
-          color="deep-orange"
-          outline
-          text-color="white"
-          icon="done"
+        <div v-if="detailInfo.orderState == '3'" class="flex justify-end">
+          <q-btn flat color="red" @click="clickStatus('4')" label="拒绝" />
+          <q-btn flat color="green" @click="clickStatus('2')" label="批准" />
+          <el-divider></el-divider>
+        </div>
+        <div
+          class="flex justify-center"
+          style="font-size: 16px; margin-bottom: 20px"
         >
-          {{ item }}
-        </q-chip>
+          <div>注册商标名:</div>
+          <div style="padding-left: 8px; color: #ff5722">
+            {{ detailInfo.trademarkName }}
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            justify-content: space-around;
+          "
+        >
+          <div v-for="item in detailInfo.files" :key="item">
+            <div style="width: 100px; height: 100px">
+              <el-image
+                style="width: 100px; height: 100px"
+                :src="item.filePath"
+                :initial-index="4"
+                :preview-src-list="srcList"
+                fit="cover"
+              >
+              </el-image>
+              <div
+                style="
+                  text-align: center;
+                  position: relative;
+                  top: 10px;
+                  font-weight: 500;
+                "
+              >
+                {{ item.label }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="position: relative; top: 100px">
+          <q-chip
+            v-for="item in tagFilter"
+            :key="item"
+            color="deep-orange"
+            outline
+            text-color="white"
+            icon="done"
+          >
+            {{ item }}
+          </q-chip>
+        </div>
       </q-card-section>
     </q-card>
   </q-dialog>
@@ -153,7 +193,15 @@ const columns = [
   { name: "updateDate", label: "完成日期", align: "left", field: "updateDate" },
 ];
 
-import { list, save, exportExcel, getServersByParams } from "@/api/rest";
+import {
+  list,
+  save,
+  exportExcel,
+  getServersByParams,
+  infoView,
+  examine,
+  exportZip
+} from "@/api/rest";
 import { ref, toRaw, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useQuasar } from "quasar";
@@ -166,6 +214,7 @@ export default {
     const alert = ref(false);
     const rows = ref([]);
     const orderCode = ref("");
+    const detailInfo = ref({});
     const authCode = ref("");
     const loading = ref(false);
     const fullWidth = ref(false);
@@ -174,6 +223,8 @@ export default {
     const tagFilter = ref([]);
     const selectModel = ref([]);
     const selectOptions = ref([]);
+
+    const srcList = ref([]);
 
     onMounted(() => {
       listData();
@@ -188,10 +239,107 @@ export default {
       alert.value = true;
     };
 
-    const viewOrder = (param) => {
-      tagFilter.value = param;
+    const clickRow = (evt, row) => {
       fullWidth.value = true;
+      infoView({ taskId: row.taskId }).then((res) => {
+        if (res.code == "200" && res.data && res.data.length > 0) {
+          detailInfo.value = res.data[0];
+
+          if (detailInfo.value.files && detailInfo.value.files.length > 0) {
+            let typeObj = {
+              1: "身份正面",
+              2: "身份反面",
+              3: "个体执照",
+              4: "公司执照",
+              5: "公章",
+              6: "logo图",
+            };
+            let filterStr = "";
+            detailInfo.value.files.forEach((item) => {
+              item.label = "";
+              if (typeObj[item.type]) {
+                item.label = typeObj[item.type];
+              }
+              console.log(item.label, 22);
+              item.filePath =
+                "http://49.235.66.253:7000/images/" + item.filePath;
+
+              // 处理标签数据
+            });
+
+            detailInfo.value.servers.forEach((item) => {
+              filterStr += item.serverNames + ";";
+            });
+
+            tagFilter.value = filterStr.split(";");
+            tagFilter.value = tagFilter.value.filter((s) => s && s.trim());
+
+            srcList.value = detailInfo.value.files.map((item) => item.filePath);
+          }
+        }
+      });
     };
+
+    const clickStatus = (status) => {
+      let data = {
+        taskId: detailInfo.value.taskId,
+        userId: localStorage.getItem("userId"),
+        orderState: status,
+      };
+
+      fullWidth.value = false;
+      listData();
+
+      examine(data).then((res) => {
+        if (res.code == "200") {
+          listData();
+        }
+      });
+    };
+
+    const viewOrder = (param) => {
+      // tagFilter.value = param;
+      // fullWidth.value = true;
+    };
+
+    const clickZip = () => {
+           let info = toRaw(selected.value);
+      let taskIds = [];
+      info.forEach((item) => {
+        taskIds.push(toRaw(item));
+      });
+      if (taskIds.length > 0) {
+        const taskIdMap = taskIds.map((item) => item.taskId);
+        const taskId = taskIdMap.join(",");
+        exportZip({ taskId }).then((res) => {
+          if (!res) {
+            $q.notify({
+              position: "top",
+              type: "negative",
+              message: res.msg,
+              timeout: 1500,
+            });
+          }
+          const content = res;
+          const blob = new Blob([content]);
+          const elink = document.createElement("a");
+          elink.download = "压缩包.zip";
+          elink.style.display = "none";
+          elink.href = URL.createObjectURL(blob);
+          document.body.appendChild(elink);
+          elink.click();
+        });
+      } else {
+        $q.notify({
+          position: "top",
+          type: "negative",
+          message: "请选择订单",
+          timeout: 1500,
+        });
+      }
+
+
+    }
 
     const clickExcel = () => {
       let info = toRaw(selected.value);
@@ -319,6 +467,10 @@ export default {
     };
 
     return {
+      clickRow,
+      clickStatus,
+      srcList,
+      detailInfo,
       selectOptions,
       position,
       closeDialog,
@@ -327,6 +479,7 @@ export default {
       fullWidth,
       loading,
       clickExcel,
+      clickZip,
       selected,
       orderCode,
       authCode,
@@ -412,6 +565,17 @@ export default {
 }
 
 .selectWidth {
-  max-width: 400px;
+  /* max-width: 400px; */
+}
+
+.demo-image__error .image-slot {
+  font-size: 30px;
+}
+.demo-image__error .image-slot .el-icon {
+  font-size: 30px;
+}
+.demo-image__error .el-image {
+  width: 100%;
+  height: 200px;
 }
 </style>
