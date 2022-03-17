@@ -86,6 +86,10 @@ import { useRoute, useRouter } from 'vue-router'
 export default {
   name: 'MyLayout',
   setup () {
+    console.log('提交了一次');
+    console.log('提交了两次');
+
+
     const $router = useRouter()
     const $route = useRoute()
     const leftDrawerOpen = ref(false);
