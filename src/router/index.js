@@ -4,6 +4,7 @@ import { createRouter, createWebHashHistory } from "vue-router"
 import HelloWorld from '../components/HelloWorld.vue'
 import lianxi from '../components/lianxi.vue'
 import detail from '../workOrder/detail/detail.vue'
+import ts from '../workOrder/typeScript/index.vue'
 import handleOrder from '../workOrder/handleOrder/order.vue'
 import Index from '@/views/index.vue'
 import Admin from '@/views/admin.vue'
@@ -19,6 +20,7 @@ const routes = [
     { path: '/admin', component: Admin, name: 'Admin', meta: { title: '管理' } },
     { path: '/login', component: Login, name: 'Login', meta: { title: '用户登录' } },
     { path: '/login_m', component: indexManage, name: 'indexManage', meta: { title: '管理员登录' } },
+    { path: '/ts', component: ts, name: 'ts', meta: { title: 'ts练习' } },
 ];
 // history: createWebHistory(),
 
