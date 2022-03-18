@@ -19,6 +19,8 @@
 <script>
 import { ref } from 'vue'
 
+console.log('main-1');
+
 const columns = [
   {
     name: 'desc',
