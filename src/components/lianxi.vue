@@ -21,6 +21,8 @@ import { ref } from 'vue'
 
 console.log('main-1');
 
+console.log("f-1");
+
 const columns = [
   {
     name: 'desc',
