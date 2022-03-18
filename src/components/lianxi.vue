@@ -19,10 +19,10 @@
 <script>
 import { ref } from 'vue'
 
-console.log('main-2');
+console.log('main-3');
 
+console.log("f-2");
 
-console.log("f-1");
 
 const columns = [
   {
