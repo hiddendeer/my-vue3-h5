@@ -19,7 +19,8 @@
 <script>
 import { ref } from 'vue'
 
-console.log('main-1');
+console.log('main-2');
+
 
 console.log("f-1");
 
