@@ -27,6 +27,8 @@ console.log('修复了已知问题');
 
 console.log('hot修改');
 
+console.log('修复了紧急bug');
+
 
 const columns = [
   {
