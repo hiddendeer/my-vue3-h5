@@ -19,19 +19,7 @@
 <script>
 import { ref } from 'vue'
 
-console.log('main-4');
-
-console.log("f-5");
-
-console.log('修复了已知问题');
-
-console.log('hot修改');
-
-console.log('修复了紧急bug');
-
-console.log('我继续dev开发了');
-
-console.log('hot2');
+console.log(111);
 
 
 const columns = [
