@@ -31,6 +31,8 @@ console.log('修复了紧急bug');
 
 console.log('我继续dev开发了');
 
+console.log('hot1');
+
 
 const columns = [
   {
