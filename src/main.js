@@ -2,29 +2,31 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router/index'
 import store from './store/index'
+import * as ElIconModules from '@element-plus/icons-vue'
 import "tailwindcss/tailwind.css"
-// import Vant from 'vant';
-// import 'vant/lib/index.css';
+// Import quasar info
 import { Quasar,Dialog,Notify } from 'quasar'
 import quasarLang from 'quasar/lang/zh-CN'
-// lang: quasarLang,
-// Import Quasar css
-// import 'quasar/src/css/index.sass'
 import 'quasar/dist/quasar.css'
-// Import icon libraries
 import '@quasar/extras/material-icons/material-icons.css'
 import '@quasar/extras/material-icons-outlined/material-icons-outlined.css'
 
 const app = createApp(App)
 
+// 全局引入ElIcon
+for (const iconName in ElIconModules) {
+  if (Reflect.has(ElIconModules, iconName)) {
+    const item = ElIconModules[iconName]
+    app.component(iconName, item)
+  }
+}
 
 app.use(Quasar, {
     plugins: {Dialog,Notify}, // import Quasar plugins and add here
     lang: quasarLang,
   })
-// app.use(Vant)
-app.use(router)
-app.use(store)
+
+app.use(router).use(store)
 app.mount('#app')
 
 

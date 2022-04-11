@@ -2,107 +2,67 @@
   <el-menu
     default-active="1"
     class="el-menu-vertical-demo el-menu-styles"
-    @open="handleOpen"
-    @close="handleClose"
     active-text-color="#722ed1"
+    :unique-opened="true"
   >
-    <el-sub-menu index="2">
+    <el-sub-menu
+      v-for="(item, index) in menuList"
+      :index="index + ''"
+      :key="index"
+    >
       <template #title>
-        <el-icon><location /></el-icon>
-        <span>系统功能</span>
+        <el-icon><component :is="item.icon" /></el-icon>
+        <span>{{ item.label }}</span>
       </template>
       <div
+        v-for="(v, k) in item.children"
+        :key="k"
         v-ripple="{ color: 'purple-8' }"
         class="relative-position container flex flex-center"
         style="height: 50px"
+        @click="_selectItem(index, k)"
+        :class="[
+          index + '-' + k == selectIndex
+            ? 'menu-item-select'
+            : 'menu-item-border',
+        ]"
       >
-        <el-menu-item index="2-1">菜单1</el-menu-item>
+        <el-menu-item :index="index + '-' + k">{{ v.label }}</el-menu-item>
       </div>
-      <div
-        v-ripple="{ color: 'purple-8' }"
-        class="relative-position container flex flex-center q-mt-sm"
-        style="height: 50px"
-      >
-        <el-menu-item index="2-2">菜单2</el-menu-item>
-      </div>
-      <div
-        v-ripple="{ color: 'purple-6' }"
-        class="relative-position container flex flex-center"
-      >
-        <el-menu-item index="2-3">菜单3</el-menu-item>
-      </div>
-    </el-sub-menu>
-    <el-sub-menu index="3">
-      <template #title>
-        <el-icon><bell /></el-icon>
-        <span>菜单权限</span>
-      </template>
-      <div
-        v-ripple="{ color: 'purple-6' }"
-        class="relative-position container flex flex-center q-mt-sm"
-        style="height: 50px"
-      >
-        <el-menu-item index="3-1">菜单1</el-menu-item>
-      </div>
-      <div
-        v-ripple="{ color: 'purple-6' }"
-        class="relative-position container flex flex-center q-mt-sm"
-        style="height: 50px"
-      >
-        <el-menu-item index="3-2">菜单2</el-menu-item>
-      </div>
-      <div
-        v-ripple="{ color: 'purple-6' }"
-        class="relative-position container flex flex-center q-mt-sm"
-        style="height: 50px"
-      >
-        <el-menu-item index="3-3">菜单3</el-menu-item>
-      </div>
-    </el-sub-menu>
-    <el-sub-menu index="4">
-      <template #title>
-        <el-icon><data-line /></el-icon>
-        <span>数据权限</span>
-      </template>
-      <el-menu-item index="4-1">item one</el-menu-item>
-      <el-menu-item index="4-2">item one</el-menu-item>
-      <el-menu-item index="4-3">item three</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="1">
-      <template #title>
-        <el-icon><avatar /></el-icon>
-        <span>用户管理</span>
-      </template>
-      <el-menu-item index="1-1">item one</el-menu-item>
-      <el-menu-item index="1-2">item one</el-menu-item>
-      <el-menu-item index="1-3">item three</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="5">
-      <template #title>
-        <el-icon><suitcase /></el-icon>
-        <span>系统配置</span>
-      </template>
-      <el-menu-item index="5-1">item one</el-menu-item>
-      <el-menu-item index="5-2">item one</el-menu-item>
-      <el-menu-item index="5-3">item three</el-menu-item>
     </el-sub-menu>
   </el-menu>
 </template>
 
 <script setup>
-import {
-  Location,
-  Bell,
-  Avatar,
-  DataLine,
-  Suitcase,
-} from "@element-plus/icons-vue";
+import { reactive, ref } from "vue";
+
+const menuList = reactive([
+  {
+    label: "系统功能",
+    icon: "Location",
+    children: [
+      { label: "菜单1", path: "/a" },
+      { label: "菜单2", path: "/b" },
+    ],
+  },
+  {
+    label: "基础数据",
+    icon: "Bell",
+    children: [
+      { label: "菜单1", path: "/a" },
+      { label: "菜单2", path: "/b" },
+    ],
+  },
+]);
+
+let selectIndex = ref("");
+const _selectItem = (index, k) => {
+  selectIndex.value = index + "-" + k;
+  console.log(selectIndex.value);
+};
 </script>
 
 <style lang="scss">
-.el-sub-menu {
-  border-left:3px solid #722ed1;
-}
 .el-menu-styles {
   position: relative;
   top: 20px;
@@ -114,11 +74,16 @@ import {
   color: #722ed1;
 }
 .el-menu-item {
-  border-radius: 20px;
+  border-left: 3px solid #fff !important;
   &:hover {
     background-color: transparent !important;
     color: #722ed1;
-
   }
+}
+.menu-item-border {
+  border-left: 3px solid #fff !important;
+}
+.menu-item-select {
+  border-left: 3px solid #722ed1 !important;
 }
 </style>

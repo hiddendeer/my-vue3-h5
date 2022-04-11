@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { useStore } from "vuex";
 import type {

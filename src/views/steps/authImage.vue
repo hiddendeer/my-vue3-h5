@@ -116,7 +116,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineEmits, defineProps} from "vue";
+import { ref} from "vue";
 import { useStore } from "vuex"
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
