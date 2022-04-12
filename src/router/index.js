@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory } from "vue-router"
 
 import HelloWorld from '../components/HelloWorld.vue'
 import lianxi from '../components/lianxi.vue'
-import Layout from '../components/vr-layout.vue'
+import Layout from '@/layout/vr-layout.vue'
 import detail from '../workOrder/detail/detail.vue'
 import handleOrder from '../workOrder/handleOrder/order.vue'
 import Index from '@/views/index.vue'
@@ -20,7 +20,6 @@ const routes = [
             }
         ]
     },
-    // { path: '/lianxi', component: lianxi },
     { path: '/detail', component: detail, name: 'details', meta: { title: '任务详情' } },
     { path: '/handle-order', component: handleOrder, name: 'handle-order', meta: { title: '任务详情' } },
     { path: '/index', component: Index, name: 'Index', meta: { title: '首页' } },

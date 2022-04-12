@@ -8,7 +8,7 @@
       <q-toolbar>
         <q-icon name="fact_check" style="color: #1c6dd0" size="28px" />
         <q-toolbar-title shrink class="text-weight-bold">
-          学无止境
+          伟岸纵横
         </q-toolbar-title>
         <q-btn
           v-if="isShow"
@@ -64,7 +64,7 @@
 <script setup>
 import { ref, onMounted, toRaw, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import LayoutLeftNav from "@/components/LayoutLeftNav.vue";
+import LayoutLeftNav from "@/components/layout-left.vue";
 
 const $router = useRouter();
 const $route = useRoute();
